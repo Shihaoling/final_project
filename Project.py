@@ -4,6 +4,7 @@ import streamlit as st
 import numpy as np
 import plotly.figure_factory as ff
 import seaborn as sns
+import scipy
 
 def findsimilar(data,searched_name):
     letter_vector = [0]*26
