@@ -415,6 +415,9 @@ with tab_free_throw:
     st.pyplot(fig)
 
 # end
+st.write(' ')
+st.write(' ')
+st.write(' ')
 st.caption('This is an mini-app designed and made by Haoling SHi and Boyue Yang. With student ID: 42054001, 42054055')
 st.caption('We use the data from the website [basketball reference](https://www.basketball-reference.com/leagues/NBA_2022_totals.html)')
 st.caption('Aurthor\'s Email address: henryhlshi@gmail.com')
