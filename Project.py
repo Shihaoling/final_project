@@ -380,6 +380,7 @@ with tab_free_throw:
     # Percentage of Free Throw
     data1 = total[['Player','Pos','Age','Tm','G','MP','FG%','3P','3PA','3P%','2P','2PA','FT','FTA','PTS']]
     data1 = data1[data1['PTS']>200]
+    data1 = data1[data1['Tm'].isin(selected_team)]
     data1['PTA'] = data1['PTS']/data1['G']
     data1['MPA'] = data1['MP']/data1['G']
     data1['FT%'] = data1['FT']/data1['FTA']
