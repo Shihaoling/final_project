@@ -60,7 +60,7 @@ tab_basic, tab_3PTS, tab_3PTA, tab_free_throw = st.tabs(["Basic Data", "Three-po
 with tab_basic:
 
     # build the app
-    selected_season = st.sidebar.radio(label='Select the season', options=pd.Series(["2021-2022", '2020-2021', '2019-2020']), index=0)
+    selected_season = st.sidebar.radio(label='Select the season', options=pd.Series(["2021-2022"]), index=0)
 
     #delete the TOT and use the multiselect
     unique_team = basic['Tm'].unique()
