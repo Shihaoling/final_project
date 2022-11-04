@@ -41,6 +41,7 @@ st.spinner(text="We will show detail you want soon......")
 
 # do the description work
 st.header('Welcome to NBA Data World')
+st.markdown('In our websites, you can freely browse data for players in the league. You can also query data using different conditions.  Affiliated with the data you want, we also provide **insightgul and professional** analysis.')
 
 # read the file and do the cleanning in advanced file(it only lacks little data)
 basic = pd.read_excel('2021-2022basic.xlsx', index_col=0)
@@ -412,3 +413,9 @@ with tab_free_throw:
     plt.axhline(y = data1[data1['Pos']=='SF']['%_ofPTSbyFT'].mean() ,ls = ':',label = 'FT percent for SF',color = [0,0.75,0.75])
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
+
+# end
+st.caption('This is an mini-app designed and made by Haoling SHi and Boyue Yang. With student ID: 42054001, 42054055')
+st.caption('We use the data from the website [basketball reference](https://www.basketball-reference.com/leagues/NBA_2022_totals.html)')
+st.caption('Aurthor\'s Email address: henryhlshi@gmail.com')
+st.caption('Copyright © 2022, SWUFE')
