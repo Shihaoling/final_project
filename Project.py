@@ -1,9 +1,7 @@
-from tokenize import group
 import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 import numpy as np
-from PIL import Image
 import plotly.figure_factory as ff
 import seaborn as sns
 
