@@ -4,4 +4,4 @@ streamlit
 numpy
 wordcloud
 plotly
-seabornS
+seaborn
