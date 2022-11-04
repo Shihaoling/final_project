@@ -111,7 +111,6 @@ with tab_basic:
         col2.metric(f'Individual 2P% ({percent_2:.2%})', f'{individual_2PT:.2%}',f'{delt_individual_2PT:.2%}')
         col3.metric(f'Individual PTS ({percent_T:.2%})', f'{individual_PTS:.2f}'+' PTS',f'{delt_individual_PTS:.2f} PTS')
 
-
     # filter according to the team. and do the explanation work
     basic = basic[basic['Tm'].isin(selected_team)]
     st.write(basic)
@@ -300,40 +299,33 @@ with tab_3PTS:
     data1['%_ofPTS_by3P'] = 3*(data1['3P']/data1['PTS'])  #三分球得分占比
     st.subheader('Total points and 3 field goal points')
     PTS_constraints = st.slider('Adjust the lowest PTS constraints',200,2200,200)
-    three_P_constraints = st.slider('Adjust the lowest 3 PT scored constraints',0,900,0)
+    three_P_constraints = st.slider('Adjust the lowest 3 PT scored constraints',0,300,0)
     fig, ax = plt.subplots()
     data1 = data1.reset_index(drop = True)
     total_mirror = data1[(data1['PTS'] > PTS_constraints) & (data1['3P'] > three_P_constraints)]
-    col_plot, col_data = st.columns([3,1])
-    with col_plot:
-        sns.scatterplot(x = 'PTS', y = 3*data1['3P'], data = total_mirror, hue = 'Pos')
-        plt.axvline(x = PTS_constraints ,ls = 'dashed',label = 'total points more than 1750',color = [0,0,0.75])
-        plt.axhline(y = 3 * three_P_constraints ,ls = 'dotted',label = 'total three points more than 600',color = [0,0.5,0.5])
-        plt.xlim(0,2200)
-        plt.ylim(0,900)
-        plt.legend(loc = 2, bbox_to_anchor = (1,1))
-        st.pyplot(fig)
+    sns.scatterplot(x = 'PTS', y = 3*data1['3P'], data = total_mirror, hue = 'Pos')
+    plt.axvline(x = PTS_constraints ,ls = 'dashed',label = 'total points more than 1750',color = [0,0,0.75])
+    plt.axhline(y = 3 * three_P_constraints ,ls = 'dotted',label = 'total three points more than 600',color = [0,0.5,0.5])
+    plt.xlim(0,2200)
+    plt.ylim(0,900)
+    plt.legend(loc = 2, bbox_to_anchor = (1,1))
+    st.pyplot(fig)
+    st.write(total_mirror[['Player','Tm','PTS','3P','MPA','PTA']]) 
+
     st.subheader('Proportion of 3P Points in Total Points')
     percent_3PT = st.slider('Adjust the 3 PTS proportion',0.0,1.0,0.0)
-    with col_data:
-        st.write(total_mirror[['Player','PTS','3P']])
-
-    col_plot, col_data = st.columns([3,1])
-    
-    with col_plot:
-        filter = data1[data1['%_ofPTS_by3P'] > percent_3PT]
-        fig, ax = plt.subplots()
-        sns.scatterplot(x = 'PTS', y = 3*filter['3P'], data = filter, hue = 'Pos')
-        st.pyplot(fig)
-    with col_data:
-        st.write(filter[['Player','PTS','%_ofPTS_by3P']])
+    filter = data1[data1['%_ofPTS_by3P'] > percent_3PT]
+    fig, ax = plt.subplots()
+    sns.scatterplot(x = 'PTS', y = 3*filter['3P'], data = filter, hue = 'Pos')
+    st.pyplot(fig)
+    st.write(filter[['Player','Tm','PTS','%_ofPTS_by3P','MPA','PTA','3P','3P%']])
 
 # Analysis for 3PT part2
 with tab_3PTA:
     st.subheader('3-point Field Goal Attempts and 3-point Points Proportion of Total')
     data1 = total[['Player','Pos','Age','Tm','G','MP','FG%','3P','3PA','3P%','2P','2PA','FT','FTA','PTS']]
     data1 = data1[data1['Tm'].isin(selected_team)]
-    three_attempts = st.slider('Adjust 3-Point Field Goal Attempts Per Game',0,800,0)
+    three_attempts = st.slider('Adjust 3-Point Field Goal Attempts in the whole season',0,800,0)
     three_3P_propotion = st.slider('Adujust 3-Point Field Goal Percentage ',0.0,1.0,0.0)
     data1 = data1.reset_index(drop = True)
     total_mirror = data1[(data1['3PA'] > three_attempts) & (data1['3P%'] > three_3P_propotion)]
@@ -341,6 +333,7 @@ with tab_3PTA:
     sns.scatterplot(x = '3PA', y = total_mirror['3P'], data = total_mirror, hue = 'Pos')
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
+    st.write(total_mirror)
 
 # Analysis for free throw
 with tab_free_throw:
@@ -362,8 +355,8 @@ with tab_free_throw:
     plt.axhline(y = basic[basic['Pos']=='SF']['FT'].mean(),ls = '--',label = "SF",color = [0,0.9,0])
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
-    FTA_number = st.slider('Please adjust the number of FTA', 0, 11,0)
-    FT_PTS = st.slider('Please adjust the points got of FT',0,8,0)
+    FTA_number = st.slider('Drag  the sidebar to select the least number of the average free throw attempts in one game', 0, 11,0)
+    FT_PTS = st.slider('Drag the sidebar to select then average lowest points got from free throw in one game',0,8,0)
     fig, ax =plt.subplots()
     sns.scatterplot(x = 'FTA', y = 'FT', data = basic[(basic['FTA'] > FTA_number) & (basic['FT'] > FT_PTS)], hue = 'Pos')
     st.pyplot(fig)
@@ -377,6 +370,7 @@ with tab_free_throw:
     sns.scatterplot(x = 'FTA', y = 'FT', data = basic[(basic['FT%']>free_throw_percentage) & (basic['G']>30) & (basic['MP']>15)], hue = 'Pos')
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
+    st.write(basic[(basic['FT%']>free_throw_percentage) & (basic['G']>30) & (basic['MP']>15)])
 
     # Percentage of Free Throw
     data1 = total[['Player','Pos','Age','Tm','G','MP','FG%','3P','3PA','3P%','2P','2PA','FT','FTA','PTS']]
