@@ -200,7 +200,7 @@ with tab_basic:
                     ax.set_title(f'AST of each player in {team}')
                     st.pyplot(fig)
                     expander = st.expander(f"Players wordcloud for {team}")
-                    expander.image('image\\'+team+'.png')
+                    expander.image('image/'+team+'.png')
                 with col_data:
                     st.write(basic[basic['Tm'] == team][['Player','AST']].sort_values('AST',ascending=False).reset_index(drop=True))
 
