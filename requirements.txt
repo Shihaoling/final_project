@@ -1,4 +1,3 @@
-tokenize
 pandas
 matplotlib
 streamlit
