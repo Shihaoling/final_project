@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 import numpy as np
-from wordcloud import WordCloud, ImageColorGenerator
 from PIL import Image
 import plotly.figure_factory as ff
 import seaborn as sns
@@ -54,7 +53,6 @@ total = pd.read_excel("2021-2022total.xlsx",index_col=0)
 
 # Deal with the data
 data1 = total[['Player','Pos','Age','Tm','G','MP','FG%','3P','3PA','3P%','2P','2PA','FT','FTA','PTS']]
-
 
 # Use the tab function to make the app more orderly.
 tab_basic, tab_3PTS, tab_3PTA = st.tabs(["Basic Data", "Total points and three-point field goals","Number of three points made and three-point attempts"])
