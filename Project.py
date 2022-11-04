@@ -55,7 +55,7 @@ total = pd.read_excel("2021-2022total.xlsx",index_col=0)
 data1 = total[['Player','Pos','Age','Tm','G','MP','FG%','3P','3PA','3P%','2P','2PA','FT','FTA','PTS']]
 
 # Use the tab function to make the app more orderly.
-tab_basic, tab_3PTS, tab_3PTA, tab_free_throw = st.tabs(["Basic Data", "Three-point field goals and total","3 PT proportion and three-point attempts","Free throw Analysis"])
+tab_basic, tab_3PTS, tab_3PTA, tab_free_throw = st.tabs(["Basic Data", "Total scores and three point scores","three point percentage and attempts","Free throw Analysis"])
 
 with tab_basic:
 
@@ -299,42 +299,74 @@ with tab_3PTS:
     data1['MPA'] = data1['MP']/data1['G']  #MPA场均出场时间
     data1['%_ofPTS_by3P'] = 3*(data1['3P']/data1['PTS'])  #三分球得分占比
     st.subheader('Total points and 3 field goal points')
-    PTS_constraints = st.slider('Adjust the lowest PTS constraints',200,2200,200)
-    three_P_constraints = st.slider('Adjust the lowest 3 PT scored constraints',0,300,0)
+    PTS_constraints = st.slider('drag the sidebar to assign the lowest total scores',200,2200,200)
+    three_P_constraints = st.slider('drag the side bar to assign the lowest number of three points hitted',0,300,0)
     fig, ax = plt.subplots()
     data1 = data1.reset_index(drop = True)
     total_mirror = data1[(data1['PTS'] > PTS_constraints) & (data1['3P'] > three_P_constraints)]
     sns.scatterplot(x = 'PTS', y = 3*data1['3P'], data = total_mirror, hue = 'Pos')
-    plt.axvline(x = PTS_constraints ,ls = 'dashed',label = 'total points more than 1750',color = [0,0,0.75])
-    plt.axhline(y = 3 * three_P_constraints ,ls = 'dotted',label = 'total three points more than 600',color = [0,0.5,0.5])
+    plt.axvline(x = PTS_constraints ,ls = 'dashed',color = [0,0,0.75])
+    plt.axhline(y = 3 * three_P_constraints ,ls = 'dotted',color = [0,0.5,0.5])
     plt.xlim(0,2200)
     plt.ylim(0,900)
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
-    st.write(total_mirror[['Player','Tm','PTS','3P','MPA','PTA']]) 
+    st.write(total_mirror[['Player','Tm','PTS','3P','MPA','PTA']])
+    expander = st.expander("See explanation")
+    expander.write(f"""
+    Tm：Team 
+    \nPTS：Total points scored in regular season 2021-2022
+    \n3P: total three point ball hitted
+    \nMPA: average minutes played
+    \nPTA: average points
+    """) 
 
     st.subheader('Proportion of 3P Points in Total Points')
-    percent_3PT = st.slider('Adjust the 3 PTS proportion',0.0,1.0,0.0)
+    percent_3PT = st.slider('Drag the sidebar to select the least proportion of points by three point ball',0.0,1.0,0.0)
     filter = data1[data1['%_ofPTS_by3P'] > percent_3PT]
     fig, ax = plt.subplots()
     sns.scatterplot(x = 'PTS', y = 3*filter['3P'], data = filter, hue = 'Pos')
     st.pyplot(fig)
     st.write(filter[['Player','Tm','PTS','%_ofPTS_by3P','MPA','PTA','3P','3P%']])
+    expander = st.expander("See explanation")
+    expander.write(f"""
+    Tm：Team 
+    \nPTS：Total points scored in regular season 2021-2022
+    \n3P: total three point ball hitted
+    \nMPA: average minutes played
+    \nPTA: average points
+    \n3P%: three point field goal percentage
+    \n%_ofPTS_by3P: percentage of total points scored by three point ball
+    """) 
 
 # Analysis for 3PT part2
 with tab_3PTA:
     st.subheader('3-point Field Goal Attempts and 3-point Points Proportion of Total')
     data1 = total[['Player','Pos','Age','Tm','G','MP','FG%','3P','3PA','3P%','2P','2PA','FT','FTA','PTS']]
     data1 = data1[data1['Tm'].isin(selected_team)]
-    three_attempts = st.slider('Adjust 3-Point Field Goal Attempts in the whole season',0,800,0)
-    three_3P_propotion = st.slider('Adujust 3-Point Field Goal Percentage ',0.0,1.0,0.0)
+    three_attempts = st.slider('Drag the sidebar to select the least number of three points attempts in regular season 2021-2022',0,800,0)
+    three_3P_propotion = st.slider('Drag the sidebar to select the lowest three points field goal percentage in regular season 2021-2022 ',0.0,1.0,0.0)
     data1 = data1.reset_index(drop = True)
     total_mirror = data1[(data1['3PA'] > three_attempts) & (data1['3P%'] > three_3P_propotion)]
     fig, ax = plt.subplots()
     sns.scatterplot(x = '3PA', y = total_mirror['3P'], data = total_mirror, hue = 'Pos')
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
-    st.write(total_mirror)
+    st.write(total_mirror.drop(['2P','2PA','FT','FTA'], axis = 1))
+    expander = st.expander("See explanation")
+    expander.write(f"""
+    Tm：Team 
+    \nPos -- Position
+    \nAge -- Player's age on February 1 of the season
+    \nTm -- Team
+    \nG – Games played in total
+    \nMP -- Minutes Played in total
+    \nFG% -- Field Goal Percentage
+    \n3P -- 3-Point Field Goals Per Game
+    \n3PA -- 3-Point Field Goal Attempts Per Game
+    \n3P% -- 3-Point Field Goal Percentage
+    \nPTS -- Points Per Game
+    """) 
 
 # Analysis for free throw
 with tab_free_throw:
@@ -344,24 +376,37 @@ with tab_free_throw:
     basic.drop(basic[basic['Tm']=='TOT'].index,inplace=True)
     fig, ax = plt.subplots()
     sns.scatterplot(x = 'FTA', y = 'FT', data = basic, hue = 'Pos')
-    plt.axvline(x = basic[basic['Pos']=='C']['FTA'].mean(),ls = '--',label = "C",color = [0,0,0.9])
-    plt.axvline(x = basic[basic['Pos']=='PG']['FTA'].mean(),ls = '--',label = "PG",color = [0.3,0.3,0.3])
-    plt.axvline(x = basic[basic['Pos']=='SG']['FTA'].mean(),ls = '--',label = "SG",color = 'y')
-    plt.axvline(x = basic[basic['Pos']=='PF']['FTA'].mean(),ls = '--',label = "PF",color = [0,0.6,0.3])
-    plt.axvline(x = basic[basic['Pos']=='SF']['FTA'].mean(),ls = '--',label = "SF",color = 'r')
-    plt.axhline(y = basic[basic['Pos']=='C']['FT'].mean(),ls = '--',label = "C",color = [0,0,0.9])
-    plt.axhline(y = basic[basic['Pos']=='PG']['FT'].mean(),ls = '--',label = "PG",color = [0.3,0.3,0.3])
-    plt.axhline(y = basic[basic['Pos']=='SG']['FT'].mean(),ls = '--',label = "SG",color = [0,0.6,0.6])
-    plt.axhline(y = basic[basic['Pos']=='PF']['FT'].mean(),ls = '--',label = "PF",color = [0,0.6,0.3])
-    plt.axhline(y = basic[basic['Pos']=='SF']['FT'].mean(),ls = '--',label = "SF",color = [0,0.9,0])
+    plt.axvline(x = basic[basic['Pos']=='C']['FTA'].mean(),ls = '--',label = "C'sFTA average",color = [0,0,0.9])
+    plt.axvline(x = basic[basic['Pos']=='PG']['FTA'].mean(),ls = '--',label = "PG'sFTA average",color = [0.3,0.3,0.3])
+    plt.axvline(x = basic[basic['Pos']=='SG']['FTA'].mean(),ls = '--',label = "SG'sFTA average",color = 'y')
+    plt.axvline(x = basic[basic['Pos']=='PF']['FTA'].mean(),ls = '--',label = "PF'sFTA average",color = [0,0.6,0.3])
+    plt.axvline(x = basic[basic['Pos']=='SF']['FTA'].mean(),ls = '--',label = "SF'sFTA average",color = 'r')
+
+    plt.axhline(y = basic[basic['Pos']=='C']['FT'].mean(),ls = '--',label = "C'sFT average",color = [0,0,0.9])
+    plt.axhline(y = basic[basic['Pos']=='PG']['FT'].mean(),ls = '--',label = "PG'sFT average",color = [0.3,0.3,0.3])
+    plt.axhline(y = basic[basic['Pos']=='SG']['FT'].mean(),ls = '--',label = "SG'sFT average",color = [0,0.6,0.6])
+    plt.axhline(y = basic[basic['Pos']=='PF']['FT'].mean(),ls = '--',label = "PF'sFT average",color = [0,0.6,0.3])
+    plt.axhline(y = basic[basic['Pos']=='SF']['FT'].mean(),ls = '--',label = "SF'sFT average",color = [0,0.9,0])
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
+    st.markdown('**Summary**: The vertical lines represent the average Free throw attempts by different positions players, while the horizontal lines represent the average Free throws by different positions players.It reveals that SG(shooting guard) and SF(small forward) are the least two positions in the number of FTA(Free throw average) and FT(Free throw).')
+
     FTA_number = st.slider('Drag  the sidebar to select the least number of the average free throw attempts in one game', 0, 11,0)
     FT_PTS = st.slider('Drag the sidebar to select then average lowest points got from free throw in one game',0,8,0)
     fig, ax =plt.subplots()
     sns.scatterplot(x = 'FTA', y = 'FT', data = basic[(basic['FTA'] > FTA_number) & (basic['FT'] > FT_PTS)], hue = 'Pos')
     st.pyplot(fig)
     st.write(basic[(basic['FTA'] > FTA_number) & (basic['FT'] > FT_PTS)][['Player','Pos','Tm','FT','FTA','FT%','PTS']])
+    expander = st.expander("See explanation")
+    expander.write(f"""
+    Tm：Team 
+    \nPos -- Position
+    \nTm -- Team
+    \nFT -- Free Throws Per Game
+    \nFTA -- Free Throw Attempts Per Game
+    \nFT% -- Free Throw Percentage
+    \nPTS -- Points Per Game
+    """) 
 
     # Free Throw Percentage
     st.subheader('Free Throw Percentage')
@@ -371,7 +416,23 @@ with tab_free_throw:
     sns.scatterplot(x = 'FTA', y = 'FT', data = basic[(basic['FT%']>free_throw_percentage) & (basic['G']>30) & (basic['MP']>15)], hue = 'Pos')
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
-    st.write(basic[(basic['FT%']>free_throw_percentage) & (basic['G']>30) & (basic['MP']>15)])
+    st.write(basic[(basic['FT%']>free_throw_percentage) & (basic['G']>30) & (basic['MP']>15)][['Player','Pos','Age','Tm','G','MP','FG%', 'eFG%', 'FT','FTA','PTS']])
+    expander = st.expander("See explanation")
+    expander.write(f"""
+    Tm：Team 
+    \nPos -- Position
+    \nAge -- Player's age on February 1 of the season
+    \nTm -- Team
+    \nG -- Games
+    \nMP -- Minutes Played Per Game
+    \nFG% -- Field Goal Percentage
+    \neFG% -- Effective Field Goal Percentage
+    \nThis statistic adjusts for the fact that a 3-point field goal is worth one more point than a 2-point field goal.
+    \nFT -- Free Throws Per Game
+    \nFTA -- Free Throw Attempts Per Game
+    \nFT% -- Free Throw Percentage
+    \nPTS -- Points Per Game
+    """) 
 
     # Percentage of Free Throw
     data1 = total[['Player','Pos','Age','Tm','G','MP','FG%','3P','3PA','3P%','2P','2PA','FT','FTA','PTS']]
@@ -388,16 +449,29 @@ with tab_free_throw:
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
     st.write('The condition given below is using \'or\'')
-    FT_PTS_2 = st.slider('The points of free throw',0,700,0)
-    free_throw_percentage_2 = st.slider('Please Adjust Free Throw Percentage',0.0,1.0,0.0)
+    FT_PTS_2 = st.slider('Drag the sidebar to select the least number of total free throws hitted',0,700,0)
+    free_throw_percentage_2 = st.slider('Drag the sidebar to select the lowest free throw percentage',0.0,1.0,0.0)
     fig, ax = plt.subplots()
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     sns.scatterplot(x = 'PTS', y = 'FT', data = data1[(data1['%_ofPTSbyFT'] > free_throw_percentage_2) | (data1['FT'] > FT_PTS_2)], hue = 'Pos')
     st.pyplot(fig)
     st.write(data1[(data1['%_ofPTSbyFT'] > free_throw_percentage_2) | (data1['FT'] > FT_PTS_2)][['Player','Pos','Tm','MPA','FT','FTA','FT%','PTS','PTA','%_ofPTSbyFT']])
+    expander = st.expander("See explanation")
+    expander.write(f"""
+    Tm：Team 
+    \nPos -- Position
+    \nTm -- Team
+    \nMPA: Minutes Played Per Game
+    \nFT -- total Free Throws
+    \nFTA -- total Free Throw Attempts
+    \nFT% -- Free Throw Percentage
+    \nPTS -- Total points scored in the season
+    \nPTA -- Points Per Game
+    \n%_ofPTSbyFT: percentage of points scored by free throw
+    """) 
     
     # Total points and percentage of free throw
-    st.subheader('Total poins and percentage of free throw')
+    st.subheader('Total points and percentage of free throw')
     fig, ax = plt.subplots()
     sns.scatterplot(x = 'PTS', y = '%_ofPTSbyFT', data = data1, hue = 'Pos')
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
@@ -408,12 +482,13 @@ with tab_free_throw:
     plt.axhline(y = data1[data1['Pos']=='SF']['%_ofPTSbyFT'].mean() ,ls = ':',label = 'FT percent for SF',color = [0,0.75,0.75])
     plt.legend(loc = 2, bbox_to_anchor = (1,1))
     st.pyplot(fig)
+    st.markdown('**Summary**: We can derive the conclusion that Centers rely more on free throws than any other position. This is partly owing to their attacking region being proximate to the basket.')
 
 # end
 st.write(' ')
+st.write(' ') 
 st.write(' ')
-st.write(' ')
-st.caption('This is an mini-app designed and made by Haoling Shi and Boyue Yang. With student ID: 42054001, 42054055')
+st.caption('This is an mini-app designed and made by Haoling Shi and Boyue Yang. student ID: 42054001, 42054055')
 st.caption('We use the data from the website [basketball reference](https://www.basketball-reference.com/leagues/NBA_2022_totals.html)')
 st.caption('Aurthor\'s Email address: henryhlshi@gmail.com')
 st.caption('Copyright © 2022, SWUFE')
