@@ -1,0 +1,8 @@
+tokenize
+pandas
+matplotlib
+streamlit
+numpy
+wordcloud
+plotly
+seabornS
