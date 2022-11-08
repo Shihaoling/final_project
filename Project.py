@@ -5,6 +5,23 @@ import numpy as np
 import plotly.figure_factory as ff
 import seaborn as sns
 import scipy
+import base64
+
+
+def add_bg_from_local(image_file):
+    with open(image_file, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read())
+    st.markdown(
+    f"""
+    <style>
+    .stApp {{
+        background-image: url(data:image/{"png"};base64,{encoded_string.decode()});
+        background-size: cover
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True
+    )
 
 def findsimilar(data,searched_name):
     letter_vector = [0]*26
@@ -36,6 +53,8 @@ def findsimilar(data,searched_name):
         index += 1
     return data['Player'].iloc[position]
 
+
+add_bg_from_local('background.png')
 plt.style.use('seaborn')
 
 st.spinner(text="We will show detail you want soon......")
@@ -492,3 +511,4 @@ st.caption('This is an mini-app designed and made by Haoling Shi and Boyue Yang.
 st.caption('We use the data from the website [basketball reference](https://www.basketball-reference.com/leagues/NBA_2022_totals.html)')
 st.caption('Aurthor\'s Email address: henryhlshi@gmail.com')
 st.caption('Copyright © 2022, SWUFE')
+
